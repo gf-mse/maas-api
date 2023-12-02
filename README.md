@@ -13,6 +13,7 @@
 
 # Quickstart
 
+ * forked from Jelle Helsen's [maas-api](https://github.com/jellehelsen/maas-api), which is now archived and read-only.
 
 <a id="org8a0e592"></a>
 
