@@ -65,14 +65,14 @@ class Client(object):
         """
         super(Client, self).__init__()
         consumer_key, key, secret = api_key.split(":")
-        self.base_url = url
+        self.base_url = url.rstrip('/')
         self.session = OAuth1Session(
             consumer_key, resource_owner_key=key, resource_owner_secret=secret
         )
         self.load_resources()
 
     def load_resources(self):
-        response = self.session.get(f"{self.base_url}api/2.0/describe/")
+        response = self.session.get(f"{self.base_url}/api/2.0/describe/")
         self.description = response.json()
         for resource in self.description["resources"]:
             if resource["auth"]:
