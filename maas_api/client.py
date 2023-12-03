@@ -14,7 +14,7 @@ def handler_command_name(string):
     parts = re_camelcase.findall(string)
     parts = (part.lower() for part in parts)
     parts = (part for part in parts if part != "handler")
-    return "-".join(parts)
+    return "_".join(parts)
 
 
 class Action:
