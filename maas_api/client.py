@@ -38,6 +38,7 @@ class Action:
         self.method = method
         self.op = op
         self.doc = doc
+        self.__doc__ = f"method: {method.lower()}\n---\n" + doc
         self.restful = restful
 
     def __call__(self, **kwargs):
@@ -47,8 +48,18 @@ class Action:
         params = None
         if self.op is not None:
             params = {"op": self.op}
+        # GET and DELETE requests
+        # nb: code comments in "api.py" say that DELETE methods do not take parameters,
+        #     [ https://github.com/cloudbase/maas/blob/master/src/maasserver/api.py ]
+        #     but it is clearly not quite true -- for example, 
+        #     UserHandler::delete() has an optional 'transfer_resources_to' argument,
+        #     which shall /probably/ come via the url part
+        #     ( https://www.rfc-editor.org/rfc/rfc9110#DELETE )
+        if self.method in ('GET', 'DELETE'):
+            kw_params = kwargs.pop('params', {})
+            params.update( kw_params )
         # POST requests
-        if self.method == 'POST':
+        elif self.method == 'POST':
             files = kwargs.get('files', {})
             kwargs['files'] = convert_files_arg(files)
 
@@ -69,6 +80,10 @@ class Handler:
         self.session = session
         self.uri = definition["uri"]
         self.params = definition["params"]
+        doc = definition.get("doc", None)
+        self.__doc__ = f"path: {definition['path']!r}"
+        if doc:
+            self.__doc__ += f"\ndoc: {doc}"
         # self.actions = [Action(**action) for action in actions]
         for action in definition["actions"]:
             setattr(self, action["name"], Action(handler=self, **action))
