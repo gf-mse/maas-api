@@ -106,7 +106,7 @@ functionality that is available with MAAS.
 There is however a [CLI](https://github.com/maas/maas/tree/master/src) written in python. This allows all the functionality to
 be used.
 
-To add, Jelle Helsen's code is very well written -- simple and clean, so it is relatively easy work with.
+To add, Jelle Helsen's code is very well written -- simple and clean, so it is relatively easy to work with.
 
 
 <a id="orgfb84d69"></a>
