@@ -75,10 +75,10 @@ To add, Jelle Helsen's code is very well written -- simple and clean, so it is r
 # How?
 
 By using the same technique as the official CLI. By using the API description
-available at [/MAAS/api/2.0/describe](file:///MAAS/api/2.0/describe). This allows us to expose the full API
+available at `/MAAS/api/2.0/describe`. This allows us to expose the full API
 exposed by the MAAS server and to keep functional parity with the CLI.
 
-(At the moment of witing) MaaS API is self-described via an API endpoint at `${servername}:5240/MAAS/api/2.0/describe/`, 
+(At the moment of writing) MaaS API is self-described via an API endpoint at `${servername}:5240/MAAS/api/2.0/describe/`, 
 so the Client object can be built using that description and its methods can be invoked via the syntax `client.handler.action()` -- for example,
 `client.users.whoami()` would use the API endpoint url `${servername}:5240/MAAS/api/2.0/users/?op=whoami`.
 
