@@ -13,6 +13,8 @@
 
 # Quickstart
 
+A thin [requests][requests]-based MaaS REST API wrapper
+
  * forked from Jelle Helsen's [maas-api](https://github.com/jellehelsen/maas-api), which is now archived and read-only.
  * README file below is modified, the original README is here: [(original README)](README.orig.md)
 
@@ -37,7 +39,7 @@ You can use the api client the same way you would use the CLI. Assuming that Maa
     client = Client("http://192.0.2.10:5240/MAAS", api_key="your:api:key")
     
     # check the object
-    print( client.users.whoami.doc )
+    print( client.users.whoami.__doc__ )
 
     # test connection
     import json
@@ -51,6 +53,43 @@ You can use the api client the same way you would use the CLI. Assuming that Maa
     client.machine.deploy(system_id=machine["system_id"])
     # release the machine
     client.machine.release(system_id=machine["system_id"])
+
+_fixme: unify get, post and put_
+
+### Using - default arguments
+
+Handler arguments can be just passed by their name:
+
+    print( client.user.__doc__ )          # => expects 'username' as its default argument
+    print( client.user.delete.__doc__ )   # => .delete() action has an _optional_ parameter
+                                          #      'transfer_resources_to', 
+                                          #    which we won't be using here
+
+    status_code = client.user.delete( username = 'testuser1' )
+    print( status_code )
+
+### Using - GET methods
+
+    print( client.maas.__doc__  ) # => a GET method
+    print( client.maas.get_config.__doc__  ) # get acceptable 'name' parameter values
+    params = dict( name = 'node_timeout' )
+    print( client.maas.get_config( params = params ) )
+    # => prints a single value -- the timeout setting expressed in minutes
+
+### Using - POST methods
+
+An example taken from the ["How"](#orgfb84d69) section below:
+
+    print( client.users.__doc__  ) # => a POST method
+    print( client.users.create.__doc__ ) # => action parameters
+
+    userdata = dict( username = 'testuser1',
+                     email = 'maas-testuser1@localhost',
+                     password = 'a_secret_passphrase',
+                     is_superuser = 0
+                   )
+    result = client.users.create( files = userdata )
+    print( json.dumps( result, indent = 2 ) )
 
 
 ### Troubleshooting
@@ -87,13 +126,14 @@ as well as any standard [requests](https://requests.readthedocs.io/en/latest/api
 for example, any action for the `user` handler takes a `username` argument, 
 however, `create()` action for the `users` (note the plural _s_) can also accept requests's `files` argument:
 
-    # see client.users.create.doc for a description of expected parameters
+    # see client.users.create.__doc__ for a description of expected parameters
     userdata = dict( username = 'testuser1', email = 'maas-testuser1@localhost', password = 'a_secret_passphrase', is_superuser = 0 )
     result = client.users.create( files = userdata )
     print( json.dumps( result, indent = 2 ) )
     # ( to delete the user record, invoke "client.user.delete( username = 'testuser1' )" )
 
-( MaaS [expects][maas:api.py] extra data in a `multipart/form-data` form, and [Request(files=...)][Request] can pack it there for us -- hence the `files` argument. )
+( MaaS [expects][maas:api.py] extra data in a `multipart/form-data` form, and [Request(files=...)][requests:Request] can pack it there for us -- hence the `files` argument. )
 
 [maas:api.py]: https://github.com/cloudbase/maas/blob/master/src/maasserver/api.py
-[Request]: https://requests.readthedocs.io/en/latest/api/#requests.Request
+[requests:Request]: https://requests.readthedocs.io/en/latest/api/#requests.Request
+[requests]: https://requests.readthedocs.io/en/latest/
