@@ -16,6 +16,20 @@ def handler_command_name(string):
     parts = (part for part in parts if part != "handler")
     return "_".join(parts)
 
+def convert_files_arg( mapping ):
+    """ [ https://stackoverflow.com/questions/10191733/how-to-do-a-http-delete-request-with-requests-library ]
+        to form a multipart/form-data request, requests use the 'files' argument, which we shall prepare in a special way:
+    """
+
+    d = mapping
+    result = {}
+    for k, v in d.items():
+        if not isinstance(v, (list, tuple)):
+            result[k] = (None, str(v))
+        else:
+            result[k] = v
+    return result
+
 
 class Action:
     def __init__(self, handler, name, method, op, doc, restful):
@@ -33,11 +47,19 @@ class Action:
         params = None
         if self.op is not None:
             params = {"op": self.op}
+        # POST requests
+        if self.method == 'POST':
+            files = kwargs.get('files', {})
+            kwargs['files'] = convert_files_arg(files)
+
         response = self.handler.session.request(
             self.method, url, params=params, **kwargs
         )
         if response.ok:
-            return response.json()
+            if self.method != 'DELETE':
+                return response.json()
+            else:
+                return response.status_code
         raise Exception(response.text)
 
 
@@ -67,7 +89,8 @@ class Client(object):
         consumer_key, key, secret = api_key.split(":")
         self.base_url = url.rstrip('/')
         self.session = OAuth1Session(
-            consumer_key, resource_owner_key=key, resource_owner_secret=secret
+            consumer_key, resource_owner_key=key, resource_owner_secret=secret, signature_method = 'PLAINTEXT'
+            ## consumer_key, resource_owner_key=key, resource_owner_secret=secret
         )
         self.load_resources()
 
