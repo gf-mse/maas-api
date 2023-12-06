@@ -121,7 +121,7 @@ Sadly some important parameter descriptions are missing from `/describe/` endpoi
 
 #### Documentation - check the source code
 
-Again, if some parameters are not fully documented - check the code, for example, for power options check `PowerDriver` subclasses and their `settings` entries :
+Again, if some parameters are not fully documented - check the source code, for example, for power options check `PowerDriver` subclasses and their `settings` entries :
 
  * https://github.com/maas/maas/blob/master/src/provisioningserver/drivers/power/ipmi.py
 
