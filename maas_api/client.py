@@ -42,9 +42,30 @@ class Action:
         self.restful = restful
 
     def __call__(self, **kwargs):
-        url = self.handler.uri.format(**kwargs)
+        """
+            so far still supports old requests-style invocation format
+              (username='testuser1'), 
+              (files = dict( username='testuser1', ...)), 
+              (params(dict( name = 'node_timeout' ))
+            and a new unified call format
+              ( args=dict(...) )
+        """
+
+        args = kwargs.get('args', kwargs.get('arguments', {}))
+        for p in ('args', 'arguments'):
+            if p in kwargs:
+                del kwargs[p]
+
+        url_args = kwargs.copy()
+        url_args.update(args)
+        url = self.handler.uri.format(**url_args)
+
         for p in self.handler.params:
-            del kwargs[p]
+            if p in kwargs:
+                del kwargs[p]
+            if p in args:
+                del args[p]
+
         params = None
         if self.op is not None:
             params = {"op": self.op}
@@ -56,11 +77,14 @@ class Action:
         #     which shall /probably/ come via the url part
         #     ( https://www.rfc-editor.org/rfc/rfc9110#DELETE )
         if self.method in ('GET', 'DELETE'):
-            kw_params = kwargs.pop('params', {})
-            params.update( kw_params )
+            kw_params = kwargs.pop('params', args)
+            if params:
+                params.update( kw_params )
+            else:
+                params = kw_params
         # POST requests
         elif self.method == 'POST':
-            files = kwargs.get('files', {})
+            files = kwargs.get('files', args)
             kwargs['files'] = convert_files_arg(files)
 
         response = self.handler.session.request(

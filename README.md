@@ -54,9 +54,13 @@ You can use the api client the same way you would use the CLI. Assuming that Maa
     # release the machine
     client.machine.release(system_id=machine["system_id"])
 
-_fixme: unify get, post and put_
+_<s>fixme: unify get, post and put</s> add put_
 
-### Using - default arguments
+### Using - legacy invocation
+
+By default we can just use the usual [requests][requests] interface -- as shown below
+
+#### Using - default arguments
 
 Handler arguments can be just passed by their name:
 
@@ -68,7 +72,7 @@ Handler arguments can be just passed by their name:
     status_code = client.user.delete( username = 'testuser1' )
     print( status_code )
 
-### Using - GET methods
+#### Using - GET methods
 
     print( client.maas.__doc__  ) # => a GET method
     print( client.maas.get_config.__doc__  ) # get acceptable 'name' parameter values
@@ -76,7 +80,7 @@ Handler arguments can be just passed by their name:
     print( client.maas.get_config( params = params ) )
     # => prints a single value -- the timeout setting expressed in minutes
 
-### Using - POST methods
+#### Using - POST methods
 
 An example taken from the ["How"](#orgfb84d69) section below:
 
@@ -90,6 +94,49 @@ An example taken from the ["How"](#orgfb84d69) section below:
                    )
     result = client.users.create( files = userdata )
     print( json.dumps( result, indent = 2 ) )
+
+### Using - the new way
+
+Just use the `arguments` keyword parameter:
+
+ * also can use `args` as a shortcut
+
+```sh
+    print(  client.users.whoami()  )
+    print(  json.dumps( client.users.read(), indent = 2 )  )
+    # print() wrapper removed for readability
+    client.users.create( arguments = dict( username = 'testuser1',
+                                           email = 'maas-testuser1@localhost',
+                                           password = 'a_secret_passphrase',
+                                           is_superuser = 0
+                       ))
+    client.user.delete( args = dict(username = 'testuser1') )
+    
+```
+
+### Documentation
+
+Sadly some important parameter descriptions are missing from `/describe/` endpoint [output](#orgfb84d69). 
+
+
+#### Documentation - check the source code
+
+Again, if some parameters are not fully documented - check the code, for example, for power options check `PowerDriver` subclasses and their `settings` entries :
+
+ * https://github.com/maas/maas/blob/master/src/provisioningserver/drivers/power/ipmi.py
+
+`power_parameters_*` in use:
+
+ * https://github.com/maas/maas/blob/00e818eb2434af668fefed378bc9da36548bcd0c/src/maasserver/api/machines.py#L609
+ * https://github.com/maas/maas/blob/00e818eb2434af668fefed378bc9da36548bcd0c/src/maasserver/api/regioncontrollers.py#L130
+
+#### Documentation - check the test code
+
+For example, for undocumented `power_parameetrs_*` options check `test_machine.py`, `test_machines.py` and `test_enlistment.py` source code:
+
+ * https://github.com/maas/maas/blob/master/src/maasserver/api/tests/test_machine.py
+ * https://github.com/maas/maas/blob/master/src/maasserver/api/tests/test_machines.py
+ * https://github.com/maas/maas/blob/master/src/maasserver/api/tests/test_enlistment.py
 
 
 ### Troubleshooting
