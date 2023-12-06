@@ -42,14 +42,18 @@ class Action:
         self.restful = restful
 
     def __call__(self, **kwargs):
-        """
-            so far still supports old requests-style invocation format
-              (username='testuser1'), 
-              (files = dict( username='testuser1', ...)), 
-              (params(dict( name = 'node_timeout' ))
-            and a new unified call format
-              ( args=dict(...) )
-        """
+        
+        # // moving method default docstring into comments, 
+        # // so that we can use a dynamic docstring above )
+
+        # // ex-docstring:
+        ##  so far still supports old requests-style invocation format
+        ##    (username='testuser1'), 
+        ##    (files = dict( username='testuser1', ...)), 
+        ##    (params(dict( name = 'node_timeout' ))
+        ##  and a new unified call format
+        ##    ( args=dict(...) )
+
 
         args = kwargs.get('args', kwargs.get('arguments', {}))
         for p in ('args', 'arguments'):
